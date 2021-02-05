@@ -19,7 +19,7 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 	<http:request-config name="Repose_Request_configuration" doc:name="HTTP Request configuration" doc:id="24ba17f1-28ef-4595-97c3-92076137f310" >
 		<http:request-connection host="127.0.0.1" port="8088" />
 	</http:request-config>
-	<flow name="start-repose" doc:id="f6046b94-6595-4ae4-b7d4-dff824479444" >
+	<flow name="azure-insight-example-flow" doc:id="f6046b94-6595-4ae4-b7d4-dff824479444" >
 		<http:listener doc:name="/run" doc:id="85f469fb-d20b-4d43-b8e7-63626176e84f" config-ref="HTTP_Listener_config" path="/run"/>
 		<set-variable value="#[attributes.queryParams.command]" doc:name="command" doc:id="2c819357-4070-48fd-9789-353e0a9925ba" variableName="command"/>
 		<set-variable value='#["${mule.home}/apps/${app.name}/"]' doc:name="home" doc:id="c0644da3-8117-44fa-8e13-4c2a008cad7e" variableName="home"/>
