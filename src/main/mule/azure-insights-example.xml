@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:s3="http://www.mulesoft.org/schema/mule/s3"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/s3 http://www.mulesoft.org/schema/mule/s3/current/mule-s3.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+
+
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="df2a7551-b58e-47d7-8efc-062e52ffbbd4" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="Repose_Request_configuration" doc:name="HTTP Request configuration" doc:id="24ba17f1-28ef-4595-97c3-92076137f310" >
+		<http:request-connection host="127.0.0.1" port="8088" />
+	</http:request-config>
+	<flow name="start-repose" doc:id="f6046b94-6595-4ae4-b7d4-dff824479444" >
+		<http:listener doc:name="/run" doc:id="85f469fb-d20b-4d43-b8e7-63626176e84f" config-ref="HTTP_Listener_config" path="/run"/>
+		<set-variable value="#[attributes.queryParams.command]" doc:name="command" doc:id="2c819357-4070-48fd-9789-353e0a9925ba" variableName="command"/>
+		<set-variable value='#["${mule.home}/apps/${app.name}/"]' doc:name="home" doc:id="c0644da3-8117-44fa-8e13-4c2a008cad7e" variableName="home"/>
+		<async doc:name="Async" doc:id="cb9f2538-d1cb-44e2-b610-e8a3b2ba5a5b" >
+			<java:new doc:name="New" doc:id="99d87490-0485-4bb1-960f-0efa80f4cf1a" class="com.dejim.SysCommand" constructor="SysCommand()" />
+			<java:invoke doc:name="Invoke" doc:id="bdcc81d5-1df2-4199-a7b6-ae9a5a7c5158" instance="#[payload]" class="com.dejim.SysCommand" method="process(java.lang.String,java.lang.String)">
+			<java:args><![CDATA[#[output application/java
+---
+{
+	arg0: vars.command default "",
+	arg1: vars.home
+}]]]></java:args>
+		</java:invoke>
+		</async>
+		<ee:transform doc:name="Transform Message" doc:id="5f0902dc-4e99-4a23-b193-cc2b2cb3c08a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Status": vars.command
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
