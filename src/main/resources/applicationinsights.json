@@ -1,5 +1,5 @@
 {
-  "connectionString": "InstrumentationKey=c0fb5e9f-fcdb-4812-b549-639a1dad052b;IngestionEndpoint=https://southcentralus-0.in.applicationinsights.azure.com/",
+  "connectionString": "InstrumentationKey=;IngestionEndpoint=https://southcentralus-0.in.applicationinsights.azure.com/",
   "role": {
     "name": "cloudhub"
   },
